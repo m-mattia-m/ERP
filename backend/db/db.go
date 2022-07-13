@@ -13,17 +13,14 @@ const (
 	database string = "ERP"
 )
 
-func InitDB() {
+func CreateUsersTable() {
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
 	db, err := sql.Open("mysql", connString)
-	// db, err := sql.Open("mysql", "root:6HmFbaZH2X3Z0jXjruqD@tcp(localhost:6603)/ERP")
 
 	if err != nil {
-		// Error: cant connect to DB
-		fmt.Println(err.Error())
+		fmt.Println("[DB]: Error - Can't connect to the DB \t-->\t" + err.Error())
 	} else if err = db.Ping(); err != nil {
-		// Error: lost connect to DB
-		fmt.Println(err.Error())
+		fmt.Println("[DB]: Error - Lost connection to the DB \t-->\t" + err.Error())
 	}
 	defer db.Close()
 	var createUsersQuers string = `CREATE TABLE IF NOT EXISTS users (` +
@@ -34,16 +31,29 @@ func InitDB() {
 		`Username varchar(255) NOT NULL,` +
 		`Email varchar(255) NOT NULL,` +
 		`Password varchar(255) NOT NULL,` +
-		`Role varchar(255) NOT NULL` +
+		`Role varchar(255) NOT NULL,` +
+		`Token text NULL` +
 		`);`
 	res, err := db.Exec(createUsersQuers)
 	if err != nil {
-		fmt.Println("[DB-Creation] Can't create users table \t--> " + err.Error())
+		fmt.Println("[DB]: Error - Can't create table users \t-->\t" + err.Error())
 	} else {
-		fmt.Print("[DB-Creation] Create users table was successfully \t--> ")
-		fmt.Print(res)
-		fmt.Print("\n")
+		fmt.Println("[DB]: Table users successfully created")
+		_ = res
 	}
+	defer db.Close()
+}
+
+func CreateCustomersTable() {
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
+	db, err := sql.Open("mysql", connString)
+
+	if err != nil {
+		fmt.Println("[DB]: Error - Can't connect to the DB \t-->\t" + err.Error())
+	} else if err = db.Ping(); err != nil {
+		fmt.Println("[DB]: Error - Lost connection to the DB \t-->\t" + err.Error())
+	}
+	defer db.Close()
 
 	var createCustomerQuers string = `CREATE TABLE IF NOT EXISTS customer (` +
 		`RecordId int AUTO_INCREMENT PRIMARY KEY NOT NULL,` +
@@ -52,19 +62,31 @@ func InitDB() {
 		`Lastname varchar(255) NOT NULL,` +
 		`Street varchar(255) NOT NULL,` +
 		`StreetNr int(10) NOT NULL,` +
-		`Postcode int(4) NOT NULL,` +
+		`Postcode varchar(255) NOT NULL,` +
 		`City varchar(255) NOT NULL,` +
 		`Email varchar(255) NOT NULL,` +
-		`Telefon int(16) NOT NULL` +
+		`Telefon varchar(255) NOT NULL,` +
+		`CreatedBy varchar(255) NOT NULL` +
 		`);`
-	res, err = db.Exec(createCustomerQuers)
+	res, err := db.Exec(createCustomerQuers)
 	if err != nil {
-		fmt.Println("[DB-Creation] Can't create customers table \t--> " + err.Error())
+		fmt.Println("[DB]: Error - Can't create table customer \t-->\t" + err.Error())
 	} else {
-		fmt.Print("[DB-Creation] Create customers table was successfully \t--> ")
-		fmt.Print(res)
-		fmt.Print("\n")
+		fmt.Println("[DB]: Table customers successfully created")
+		_ = res
 	}
+	defer db.Close()
+}
+
+func CreateReportsTable() {
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
+	db, err := sql.Open("mysql", connString)
+	if err != nil {
+		fmt.Println("[DB]: Error - Can't connect to the DB \t-->\t" + err.Error())
+	} else if err = db.Ping(); err != nil {
+		fmt.Println("[DB]: Error - Lost connection to the DB \t-->\t" + err.Error())
+	}
+	defer db.Close()
 
 	var createReportsQuers string = `CREATE TABLE IF NOT EXISTS reports (` +
 		`RecordId int AUTO_INCREMENT PRIMARY KEY NOT NULL,` +
@@ -76,13 +98,12 @@ func InitDB() {
 		`KundenId varchar(255) NOT NULL,` +
 		`CreaterId varchar(255) NOT NULL` +
 		`);`
-	res, err = db.Exec(createReportsQuers)
+	res, err := db.Exec(createReportsQuers)
 	if err != nil {
-		fmt.Println("[DB-Creation] Can't create reports table \t--> " + err.Error())
+		fmt.Println("[DB]: Error - Can't create table reposts \t-->\t" + err.Error())
 	} else {
-		fmt.Print("[DB-Creation] Create reports table was successfully \t--> ")
-		fmt.Print(res)
-		fmt.Print("\n")
+		fmt.Println("[DB]: Table reports successfully created")
+		_ = res
 	}
 	defer db.Close()
 }
@@ -92,16 +113,16 @@ func RunSqlQueryWithReturn(query string) (*sql.Rows, error) {
 	db, err := sql.Open("mysql", connString)
 
 	if err != nil {
-		// Error: cant connect to DB
+		fmt.Println("[DB]: Error - Can't connect to the DB \t-->\t" + err.Error())
 		return nil, err
 	} else if err = db.Ping(); err != nil {
-		// Error: lost connect to DB
+		fmt.Println("[DB]: Error - Lost connection to the DB \t-->\t" + err.Error())
 		return nil, err
 	}
 	defer db.Close()
 	res, err := db.Query(query)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("[DB]: Error - Can't run SQL-Query with Return \t-->\t" + err.Error())
 		return nil, err
 	}
 
@@ -114,16 +135,17 @@ func RunSqlQueryWithSingeReturn(query string) (*sql.Rows, error) {
 	db, err := sql.Open("mysql", connString)
 
 	if err != nil {
-		// Error: cant connect to DB
+		fmt.Println("[DB]: Error - Can't connect to the DB \t-->\t" + err.Error())
 		return nil, err
 	} else if err = db.Ping(); err != nil {
-		// Error: lost connect to DB
+		fmt.Println("[DB]: Error - Lost connection to the DB \t-->\t" + err.Error())
 		return nil, err
 	}
+
 	defer db.Close()
 	res, err := db.Query(query)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("[DB]: Error - Can't run SQL-Query with Single Return \t-->\t" + err.Error())
 		return nil, err
 	}
 
@@ -136,19 +158,19 @@ func RunSqlQueryWithoutReturn(query string) (bool, error) {
 	db, err := sql.Open("mysql", connString)
 
 	if err != nil {
-		// Error: cant connect to DB
+		fmt.Println("[DB]: Error - Can't connect to the DB \t-->\t" + err.Error())
 		return false, err
 	} else if err = db.Ping(); err != nil {
-		// Error: lost connect to DB
+		fmt.Println("[DB]: Error - Lost connection to the DB \t-->\t" + err.Error())
 		return false, err
 	}
 	defer db.Close()
 	res, err := db.Exec(query)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("[DB]: Error - Can't run SQL-Query without Return \t-->\t" + err.Error())
 		return false, err
 	}
-	fmt.Println(res)
+	_ = res
 	defer db.Close()
 	return true, nil
 }
