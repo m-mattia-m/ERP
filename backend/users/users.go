@@ -300,7 +300,7 @@ func updateUserOnDB(user User) {
 }
 
 func deleteUserFromDB(user User) {
-	var query string = "DELETE FROM `users` WHERE Id=" + user.Id + ";"
+	var query string = "DELETE FROM `users` WHERE Id='" + user.Id + "';"
 	db.RunSqlQueryWithoutReturn(query)
 }
 

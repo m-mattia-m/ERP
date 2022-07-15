@@ -93,10 +93,11 @@ func CreateReportsTable() {
 		`Id varchar(255) NOT NULL,` +
 		`Title varchar(255) NOT NULL,` +
 		`Description text NOT NULL,` +
-		`Datum datetime NOT NULL,` +
-		`Dauer double NOT NULL,` +
-		`KundenId varchar(255) NOT NULL,` +
-		`CreaterId varchar(255) NOT NULL` +
+		`Date datetime NOT NULL,` +
+		`Duration double NOT NULL,` +
+		`CustomerId varchar(255) NOT NULL,` +
+		`CreatedBy varchar(255) NOT NULL,` +
+		`CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP` +
 		`);`
 	res, err := db.Exec(createReportsQuers)
 	if err != nil {
@@ -109,7 +110,7 @@ func CreateReportsTable() {
 }
 
 func RunSqlQueryWithReturn(query string) (*sql.Rows, error) {
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", username, password, host, port, database)
 	db, err := sql.Open("mysql", connString)
 
 	if err != nil {
@@ -131,7 +132,7 @@ func RunSqlQueryWithReturn(query string) (*sql.Rows, error) {
 }
 
 func RunSqlQueryWithSingeReturn(query string) (*sql.Rows, error) {
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", username, password, host, port, database)
 	db, err := sql.Open("mysql", connString)
 
 	if err != nil {
@@ -154,7 +155,7 @@ func RunSqlQueryWithSingeReturn(query string) (*sql.Rows, error) {
 }
 
 func RunSqlQueryWithoutReturn(query string) (bool, error) {
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", username, password, host, port, database)
 	db, err := sql.Open("mysql", connString)
 
 	if err != nil {

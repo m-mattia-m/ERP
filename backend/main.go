@@ -2,6 +2,7 @@ package main
 
 import (
 	"erp/customers"
+	"erp/reports"
 	"erp/users"
 
 	"github.com/gin-gonic/gin"
@@ -16,8 +17,8 @@ func main() {
 	c := app.Group("/customers")
 	customers.Main(c)
 
-	// r := app.Group("/reports")
-	// reports.Main(r)
+	r := app.Group("/reports")
+	reports.Main(r)
 
 	app.Run(":3000")
 }
