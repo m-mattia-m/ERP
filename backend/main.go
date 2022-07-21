@@ -3,6 +3,7 @@ package main
 import (
 	"erp/customers"
 	"erp/reports"
+	"erp/timetracking"
 	"erp/users"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,9 @@ func main() {
 
 	r := app.Group("/reports")
 	reports.Main(r)
+
+	t := app.Group("/timetracking")
+	timetracking.Main(t)
 
 	app.Run(":3000")
 }

@@ -109,6 +109,33 @@ func CreateReportsTable() {
 	defer db.Close()
 }
 
+func CreateTimetrackingTable() {
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
+	db, err := sql.Open("mysql", connString)
+	if err != nil {
+		fmt.Println("[DB]: Error - Can't connect to the DB \t-->\t" + err.Error())
+	} else if err = db.Ping(); err != nil {
+		fmt.Println("[DB]: Error - Lost connection to the DB \t-->\t" + err.Error())
+	}
+	defer db.Close()
+
+	var createReportsQuers string = `CREATE TABLE IF NOT EXISTS timetracking (` +
+		`RecordId int AUTO_INCREMENT PRIMARY KEY NOT NULL,` +
+		`Id varchar(255) NOT NULL,` +
+		`Timestamp datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,` +
+		`Event varchar(255) NOT NULL,` +
+		`CreatedBy varchar(255) NOT NULL` +
+		`);`
+	res, err := db.Exec(createReportsQuers)
+	if err != nil {
+		fmt.Println("[DB]: Error - Can't create table reposts \t-->\t" + err.Error())
+	} else {
+		fmt.Println("[DB]: Table reports successfully created")
+		_ = res
+	}
+	defer db.Close()
+}
+
 func RunSqlQueryWithReturn(query string) (*sql.Rows, error) {
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", username, password, host, port, database)
 	db, err := sql.Open("mysql", connString)
